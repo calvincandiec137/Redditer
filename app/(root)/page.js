@@ -1,5 +1,6 @@
 import { PostCard } from "@/components/PostCard";
 import { CommentsCard } from "@/components/CommentsCard";
+import getlink from "@/components/getlink";
 
 const mockPost = {
   title: "This is a sample post",
@@ -31,7 +32,7 @@ const mockComments = [
   },
 ];
 
-export default function App() {
+export default async function App({ searchparams }) {
   return (
     <div className="w-3/4 min-h-lvh rounded-3xl mx-auto my-8 pt-3 bg-black">
       <PostCard post={mockPost} />
@@ -40,6 +41,7 @@ export default function App() {
           <CommentsCard key={index} comment={comment} />
         ))}
       </div>
+      <getlink />
     </div>
   );
 }
