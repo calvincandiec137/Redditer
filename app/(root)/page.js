@@ -1,16 +1,14 @@
 import { PostCard } from "@/components/PostCard";
 import { CommentsCard } from "@/components/CommentsCard";
-import getlink from "@/components/getlink";
+import Snoowrap from "snoowrap";
 
-const mockPost = {
-  title: "This is a sample post",
-  author: "exampleUser",
-  body: "Here’s the body of the post.",
-  upvotes: 123,
-  downvotes: 10,
-  createdAt: Date.now(),
-  commentCount: 5,
-};
+const reddit = new Snoowrap({
+  userAgent: "redditer", // Replace with your own user agent
+  clientId: "tTLM9CkfApkpMAOP5XQgrg", // Found in Reddit Developer Apps
+  clientSecret: "qjlV2cnDl5BBymDx7-WPXbtob6OKTw", // Found in Reddit Developer Apps
+  username: "No_Face2114", // Your Reddit username
+  password: "redditerapp", // Your Reddit password
+});
 
 const mockComments = [
   {
@@ -32,16 +30,18 @@ const mockComments = [
   },
 ];
 
-export default async function App({ searchparams }) {
+export default async function App() {
+  const postID = "1irhv39";
+  const post = await reddit.getSubmission(postID).fetch();
   return (
     <div className="w-3/4 min-h-lvh rounded-3xl mx-auto my-8 pt-3 bg-black">
-      <PostCard post={mockPost} />
+      <PostCard post={post} />
       <div className="mt-6">
         {mockComments.map((comment, index) => (
           <CommentsCard key={index} comment={comment} />
         ))}
       </div>
-      <getlink />
     </div>
   );
 }
+``;
