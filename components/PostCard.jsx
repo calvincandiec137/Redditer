@@ -14,9 +14,14 @@ export function PostCard({ post }) {
       ></p>
 
       {post.is_video && post.media?.reddit_video ? (
-        <video controls className="max-w-60 rounded-lg justify-center">
-          <source src={post.media.reddit_video.fallback_url} type="video/mp4" />
-        </video>
+        <div className="w-auto flex justify-center">
+          <video controls className="max-w-60 rounded-lg ">
+            <source
+              src={post.media.reddit_video.fallback_url}
+              type="video/mp4"
+            />
+          </video>
+        </div>
       ) : post.preview?.images ? (
         <div className="flex flex-wrap gap-2">
           {post.preview.images.map((img, index) => (
@@ -31,7 +36,7 @@ export function PostCard({ post }) {
       ) : null}
 
       <div className="flex items-center justify-between">
-        <span className="text-gray-400 text-sm">
+        <span className="text-gray-400 text-m">
           👍 {post.ups} | 👎 {post.downs}
         </span>
         <button className="text-blue-500 hover:underline">

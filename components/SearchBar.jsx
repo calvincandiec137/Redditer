@@ -6,11 +6,11 @@ export default function SearchBar() {
   const [link, setLink] = useState("");
 
   const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent page reload
+    e.preventDefault();
     if (link.trim()) {
       const url = new URL(window.location);
-      url.searchParams.set("search", link); // Add search parameter
-      window.history.pushState({}, "", url); // Update the URL without reloading
+      url.searchParams.set("search", link);
+      window.history.pushState({}, "", url); // Update the URL without reloading the page
     }
   };
 
@@ -21,10 +21,9 @@ export default function SearchBar() {
           type="text"
           placeholder="Paste the link"
           value={link}
-          onChange={(e) => setLink(e.target.value)} // Update link state on change
+          onChange={(e) => setLink(e.target.value)}
           className="w-full px-4 py-2 text-lg min-h-20 text-white bg-black border-2 border-dashed border-white rounded-2xl outline-none focus:outline-none focus:ring-0"
         />
-
         <button
           type="submit"
           className="absolute top-1/2 right-8 -translate-y-1/2 text-gray-400 hover:text-white"
