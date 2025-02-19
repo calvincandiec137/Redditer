@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function PostCard({ post }) {
   const [selectedImage, setSelectedImage] = useState(null);
+  const [mediaContent, setMediaContent] = useState([]);
 
   if (!post) return null;
 
@@ -11,10 +12,12 @@ export function PostCard({ post }) {
     if (!text) return { cleanText: "", imageUrls: [], videoUrls: [] };
 
     const imageUrlRegex = /https:\/\/(preview|i)\.redd\.it\S+/g;
-    const videoUrlRegex = /https:\/\/v\.redd\.it\S+/g;
+    const videoUrlRegex = /https:\/\/v\.redd\.it\/[a-zA-Z0-9]+/g;
 
     const imageUrls = text.match(imageUrlRegex) || [];
     const videoUrls = text.match(videoUrlRegex) || [];
+
+    console.log("Extracted video URLs:", videoUrls);
 
     let cleanText = text.replace(imageUrlRegex, "").replace(videoUrlRegex, "");
     cleanText = cleanText
@@ -26,36 +29,42 @@ export function PostCard({ post }) {
     return { cleanText, imageUrls, videoUrls };
   };
 
-  const { cleanText, imageUrls, videoUrls } = processContent(post.selftext);
+  const { cleanText, videoUrls } = processContent(post.selftext);
 
-  const getMediaContent = () => {
-    const media = [];
+  useEffect(() => {
+    const getMediaContent = () => {
+      const media = [];
 
-    if (post.preview?.images) {
-      post.preview.images.forEach((img) => {
-        media.push({
-          type: "image",
-          url: img.source.url.replace(/&amp;/g, "&"),
+      if (post.preview?.images) {
+        post.preview.images.forEach((img) => {
+          media.push({
+            type: "image",
+            url: img.source.url.replace(/&amp;/g, "&"),
+          });
         });
+      }
+
+      if (post.url?.match(/\.(jpg|jpeg|png|gif)$/)) {
+        media.push({ type: "image", url: post.url });
+      }
+
+      if (post.media?.reddit_video?.fallback_url) {
+        media.push({
+          type: "video",
+          url: post.media.reddit_video.fallback_url,
+        });
+      }
+
+      videoUrls.forEach((url) => {
+        media.push({ type: "video", url: `${url}/DASH_720.mp4` }); // Appending video format
       });
-    }
 
-    if (post.url?.match(/\.(jpg|jpeg|png|gif)$/)) {
-      media.push({ type: "image", url: post.url });
-    }
+      console.log("Final mediaContent array:", media);
+      return media;
+    };
 
-    if (post.media?.reddit_video?.fallback_url) {
-      media.push({ type: "video", url: post.media.reddit_video.fallback_url });
-    }
-
-    videoUrls.forEach((url) => {
-      media.push({ type: "video", url });
-    });
-
-    return media;
-  };
-
-  const mediaContent = getMediaContent();
+    setMediaContent(getMediaContent());
+  }, [post, videoUrls]);
 
   const openImageModal = (url) => setSelectedImage(url);
   const closeImageModal = () => setSelectedImage(null);
@@ -88,7 +97,13 @@ export function PostCard({ post }) {
                   onError={(e) => (e.target.style.display = "none")}
                 />
               ) : (
-                <video controls className="rounded-lg max-w-full h-auto">
+                <video
+                  controls
+                  className="rounded-lg max-w-full h-auto"
+                  onError={(e) =>
+                    console.log("Video failed to load:", e.target.src)
+                  }
+                >
                   <source src={media.url} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
@@ -113,7 +128,7 @@ export function PostCard({ post }) {
 
       <div className="flex items-center justify-between">
         <span className="text-gray-400 text-m">
-          👍 {post.ups} | 💬 {post.num_comments}
+          👍 {post.score} | 💬 {post.num_comments}
         </span>
       </div>
     </div>

@@ -14,7 +14,7 @@ export function CommentsCard({ comment }) {
       <p className="text-gray-200 mb-2">{comment.body}</p>
       <div className="flex items-center justify-between text-sm text-gray-400">
         <span>
-          👍 {comment.upvotes} | 👎 {comment.downvotes}
+          👍 {comment.score} | 👎 {comment.downs}
         </span>
         {comment.replies?.length > 0 && (
           <button
