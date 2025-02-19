@@ -1,7 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export function SearchBar() {
@@ -9,23 +9,21 @@ export function SearchBar() {
   const searchParams = useSearchParams();
   const [link, setLink] = useState("");
 
-  useEffect(() => {
-    const searchLink = searchParams.get("search");
-    if (searchLink) setLink(searchLink);
-  }, [searchParams]);
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (link.trim()) {
-      if (!link.includes("reddit.com/r/") && !link.includes("/comments/")) {
-        alert("Please enter a valid Reddit post URL");
-        return;
-      }
 
-      const url = new URL(window.location);
-      url.searchParams.set("search", link);
-      router.push(url.toString());
+    if (
+      !link.trim().includes("reddit.com/r/") ||
+      !link.includes("/comments/")
+    ) {
+      alert("Please enter a valid Reddit post URL");
+      return;
     }
+
+    const newSearchParams = new URLSearchParams();
+    newSearchParams.set("search", link);
+
+    window.location.href = `/?${newSearchParams.toString()}`;
   };
 
   return (

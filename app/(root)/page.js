@@ -22,23 +22,36 @@ async function getRedditContent(url) {
     const serializedPost = {
       id: post.id,
       title: post.title,
-      author: post.author.name,
-      selftext: post.selftext,
-      score: post.score,
-      created: post.created_utc,
-      url: post.url,
-      num_comments: post.num_comments,
-      subreddit: post.subreddit.display_name,
+      author: {
+        name: post.author?.name || "[deleted]",
+      },
+      selftext: post.selftext || "",
+      score: post.score || 0,
+      created: post.created_utc || 0,
+      url: post.url || "",
+      num_comments: post.num_comments || 0,
+      subreddit: post.subreddit?.display_name || "",
     };
 
-    const serializedComments = comments.map((comment) => ({
-      id: comment.id,
-      author: comment.author.name,
-      body: comment.body,
-      score: comment.score,
-      created: comment.created_utc,
-      replies: comment.replies ? serializeReplies(comment.replies) : [],
-    }));
+    const serializeComment = (comment) => {
+      if (!comment) return null;
+      return {
+        id: comment.id || "",
+        author: comment.author?.name || "[deleted]",
+        body: comment.body || "",
+        score: comment.score || 0,
+        created: comment.created_utc || 0,
+        replies: Array.isArray(comment.replies)
+          ? comment.replies
+              .map((reply) => serializeComment(reply))
+              .filter(Boolean)
+          : [],
+      };
+    };
+
+    const serializedComments = comments
+      .map((comment) => serializeComment(comment))
+      .filter(Boolean);
 
     return {
       post: serializedPost,
@@ -50,21 +63,9 @@ async function getRedditContent(url) {
   }
 }
 
-function serializeReplies(replies) {
-  if (!replies || !replies.length) return [];
-
-  return replies.map((reply) => ({
-    id: reply.id,
-    author: reply.author.name,
-    body: reply.body,
-    score: reply.score,
-    created: reply.created_utc,
-    replies: reply.replies ? serializeReplies(reply.replies) : [],
-  }));
-}
-
 export default async function Page({ searchParams }) {
-  const redditUrl = searchParams.search;
+  const { search: redditUrl } = searchParams || {};
+
   const content = redditUrl ? await getRedditContent(redditUrl) : null;
 
   return (
