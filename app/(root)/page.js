@@ -13,14 +13,12 @@ const reddit = new Snoowrap({
 
 async function getRedditContent(url) {
   try {
-    // Extract post ID from Reddit URL
     const postId = url.split("/comments/")[1]?.split("/")[0];
     if (!postId) throw new Error("Invalid Reddit URL");
 
     const post = await reddit.getSubmission(postId).fetch();
     const comments = await post.comments;
 
-    // Serialize post data
     const serializedPost = {
       id: post.id,
       title: post.title,
@@ -33,7 +31,6 @@ async function getRedditContent(url) {
       subreddit: post.subreddit.display_name,
     };
 
-    // Serialize comments
     const serializedComments = comments.map((comment) => ({
       id: comment.id,
       author: comment.author.name,
@@ -53,7 +50,6 @@ async function getRedditContent(url) {
   }
 }
 
-// Helper function to serialize nested replies
 function serializeReplies(replies) {
   if (!replies || !replies.length) return [];
 

@@ -9,7 +9,6 @@ export function SearchBar() {
   const searchParams = useSearchParams();
   const [link, setLink] = useState("");
 
-  // Initialize link from URL if present
   useEffect(() => {
     const searchLink = searchParams.get("search");
     if (searchLink) setLink(searchLink);
@@ -18,7 +17,6 @@ export function SearchBar() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (link.trim()) {
-      // Validate if it's a Reddit post URL
       if (!link.includes("reddit.com/r/") && !link.includes("/comments/")) {
         alert("Please enter a valid Reddit post URL");
         return;
